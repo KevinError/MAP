@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="MyAcademicPyramidModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Claims">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Value" Type="nchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'MyAcademicPyramid.dbo.UserClaims' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="UserClaims">
+          <Key>
+            <PropertyRef Name="UserEmail" />
+            <PropertyRef Name="ClaimID" />
+          </Key>
+          <Property Name="UserEmail" Type="nchar" MaxLength="50" Nullable="false" />
+          <Property Name="ClaimID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Email" />
+          </Key>
+          <Property Name="FirstName" Type="nchar" MaxLength="35" Nullable="false" />
+          <Property Name="MiddleName" Type="nchar" MaxLength="35" />
+          <Property Name="LastName" Type="nchar" MaxLength="35" Nullable="false" />
+          <Property Name="Email" Type="nchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_UserClaims_Claims">
+          <End Role="Claims" Type="Self.Claims" Multiplicity="1" />
+          <End Role="UserClaims" Type="Self.UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Claims">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="UserClaims">
+              <PropertyRef Name="ClaimID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserClaims_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="UserClaims" Type="Self.UserClaims" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="Email" />
+            </Principal>
+            <Dependent Role="UserClaims">
+              <PropertyRef Name="UserEmail" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MyAcademicPyramidModelStoreContainer">
+          <EntitySet Name="Claims" EntityType="Self.Claims" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserClaims" EntityType="Self.UserClaims" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [UserClaims].[UserEmail] AS [UserEmail], 
+    [UserClaims].[ClaimID] AS [ClaimID]
+    FROM [dbo].[UserClaims] AS [UserClaims]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_UserClaims_Claims" Association="Self.FK_UserClaims_Claims">
+            <End Role="Claims" EntitySet="Claims" />
+            <End Role="UserClaims" EntitySet="UserClaims" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserClaims_Users" Association="Self.FK_UserClaims_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UserClaims" EntitySet="UserClaims" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MyAcademicPyramidModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Claim">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Value" Type="String" MaxLength="50" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.UserClaims" FromRole="Claims" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Email" />
+          </Key>
+          <Property Name="FirstName" Type="String" MaxLength="35" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="MiddleName" Type="String" MaxLength="35" FixedLength="true" Unicode="true" />
+          <Property Name="LastName" Type="String" MaxLength="35" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="50" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Claims" Relationship="Self.UserClaims" FromRole="Users" ToRole="Claims" />
+        </EntityType>
+        <Association Name="UserClaims">
+          <End Role="Claims" Type="Self.Claim" Multiplicity="*" />
+          <End Role="Users" Type="Self.User" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="MyAcademicPyramidEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Claims" EntityType="Self.Claim" />
+          <EntitySet Name="Users" EntityType="Self.User" />
+          <AssociationSet Name="UserClaims" Association="Self.UserClaims">
+            <End Role="Claims" EntitySet="Claims" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MyAcademicPyramidModelStoreContainer" CdmEntityContainer="MyAcademicPyramidEntities">
+          <EntitySetMapping Name="Claims">
+            <EntityTypeMapping TypeName="MyAcademicPyramidModel.Claim">
+              <MappingFragment StoreEntitySet="Claims">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="MyAcademicPyramidModel.User">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="UserClaims" TypeName="MyAcademicPyramidModel.UserClaims" StoreEntitySet="UserClaims">
+            <EndProperty Name="Claims">
+              <ScalarProperty Name="ID" ColumnName="ClaimID" />
+            </EndProperty>
+            <EndProperty Name="Users">
+              <ScalarProperty Name="Email" ColumnName="UserEmail" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
